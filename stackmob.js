@@ -457,11 +457,15 @@
       return _.isFunction(object[prop]) ? object[prop]() : object[prop];
     },
 
-    setAPIDomain: function(apiDomain) {
+    setAPIDomain: function(apiDomain, persist) {
       if (apiDomain.indexOf('/') == apiDomain.length - 1){
         this.apiDomain = apiDomain;
       } else {
         this.apiDomain = apiDomain + '/';
+      }
+
+      if (persist === true){
+        StackMob.Storage.persist("apiDomain", this.apiDomain);
       }
     },
 
@@ -509,6 +513,9 @@
         } else {
           StackMob.setAPIDomain(apiDomain);
         }
+      } else if (_.isString(StackMob.Storage.retrieve("apiDomain"))) {
+        var domain = StackMob.Storage.retrieve("apiDomain");
+        StackMob.setAPIDomain(domain);
       }
 
       /*
@@ -1097,6 +1104,7 @@
       switch(statusCode) {
 
         // API REDIRECT
+        case 301:
         case 302:
           newLocation = response.getResponseHeader('location');
           if (_.isString(newLocation) && _.isFunction(ajaxFunc)) {
@@ -1104,7 +1112,7 @@
             params['url'] = newLocation;
 
             // Set apiDomain for subsequent requests
-            StackMob.setAPIDomain( getDomain(newLocation) );
+            StackMob.setAPIDomain( getDomain(newLocation), statusCode === 301 );
 
             // Get auth for new location
             authHeader = getAuthHeader(params);
