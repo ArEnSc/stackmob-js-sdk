@@ -76,10 +76,7 @@ describe("Unit tests for Deferred Objects", function() {
 
     runs(function() {
         // Cleanup ajax mock
-        $.mockjaxClear(mockCreate);
-        $.mockjaxClear(mockFetch);
-        $.mockjaxClear(mockPut);
-        $.mockjaxClear(mockDelete);
+        clearAllAjaxMocks();
     });
   });
 

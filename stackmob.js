@@ -789,6 +789,8 @@
           var userSchemaInfo = options['stackmob_userschemainfo'] || savedCreds['oauth2.userSchemaInfo']; //get schema info
 
           var loginField = userSchemaInfo['loginField']; //so that we can determine the primary key/login field
+          console.log("result");
+          console.log(result);
           var username = result['stackmob']['user'][loginField]; //figure out username
 
           var creds = StackMob.prepareCredsForSaving(accessToken, refreshToken, macKey, expires, username, userSchemaInfo);

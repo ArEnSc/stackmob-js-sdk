@@ -126,11 +126,11 @@ function mockDeleteAsError() {
 }
 
 function mockLoginAsSuccess() {
-  return mockLogin(200, 3);
+  return mockLogin(200, 1);
 }
 
 function mockLoginAsError() {
-  return mockLogin(401, 3);
+  return mockLogin(401, 1);
 }
 
 function clearAllAjaxMocks() {

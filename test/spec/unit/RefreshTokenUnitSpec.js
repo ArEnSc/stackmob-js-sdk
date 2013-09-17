@@ -61,7 +61,8 @@ describe("Unit tests for refresh tokens", function() {
 
     runs(function() {
         // Cleanup ajax mock
-        $.mockjaxClear();
+        clearAllAjaxMocks();
+        StackMob.clearOAuthCredentials();
     });
   });
 

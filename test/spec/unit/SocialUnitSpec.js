@@ -19,6 +19,7 @@ describe("Social Unit Tests", function() {
     mockFetch = mockFetchAsSuccess();
     mockPut = mockUpdateAsSuccess();
     mockDelete = mockDeleteAsSuccess();
+    StackMob.clearOAuthCredentials();
   });
 
   it("should call linkUserWithFacebook", function() {

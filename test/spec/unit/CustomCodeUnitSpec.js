@@ -8,18 +8,19 @@ describe("Unit tests for Custom Code", function() {
     mockFetch = mockFetchAsSuccess();
     mockPut = mockUpdateAsSuccess();
     mockDelete = mockDeleteAsSuccess();
+    StackMob.clearOAuthCredentials();
   });
 
   it("should set http verb to POST", function() {
 
     var theMethod = 'cc-method';
 
-    StackMob.customcode(theMethod, {'param': 'value'}, 'POST', {
-      inspectParams: function(model, params, method, options){
-        expect(method).toEqual(theMethod);
-        expect(options['httpVerb']).toEqual('POST');
-      }
-    });
+      StackMob.customcode(theMethod, {'param': 'value'}, 'POST', {
+        inspectParams: function(model, params, method, options){
+          expect(method).toEqual(theMethod);
+          expect(options['httpVerb']).toEqual('POST');
+        }
+      });
 
   });
 
