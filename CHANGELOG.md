@@ -6,8 +6,8 @@
 
 * Support Backbone's use of jQuery Deferred Objects
 * Not-in query support with `mustNotBeOneOf()`
-* Support API cluster redirection with 302 response status
 * New deepSave() method for saving related objects. Define related objects in `relatedSchemas` field on Model declaration.
+* Support API redirection on 301 (Permanent) and 302 (Temporary) response statuses
 
 **Fixes**
 

@@ -11,6 +11,8 @@ describe("Unit tests for API Redirect", function() {
   var mockCreate, mockRedirectedCreate;
 
   it("should set up mock ajax", function() {
+
+    // 302 - Temporary Redirect Mocks
     mockCreate = $.mockjax({
       url: 'http://api.stackmob.com/thing',
       status: 302,
@@ -40,6 +42,29 @@ describe("Unit tests for API Redirect", function() {
         sample: 'data'
       }
     });
+
+    // 301 - Permanent Redirect Mocks
+    mockPermanentCreate = $.mockjax({
+      url: 'http://api.redirected.com/permanent',
+      status: 301,
+      type: 'GET',
+      responseText: {
+        sample: 'data'
+      },
+      headers: {
+        location: 'http://api.permanent.com/permanent'
+      }
+    });
+
+    mockPermanentRedirectedCreate = $.mockjax({
+      url: 'http://api.permanent.com/permanent',
+      status: 201,
+      type: 'GET',
+      responseText: {
+        sample: 'data'
+      }
+    });
+
   });
 
   it("should redirect API on 302 response status", function() {
@@ -89,13 +114,42 @@ describe("Unit tests for API Redirect", function() {
     });
 
     runs(function() {
-      console.log(params['url']);
       expect(params['url']).toStartWith('http://api.redirected.com/');
+    });
+  });
+
+  it("should redirect on API 301 and save domain into local storage" ,function() {
+    runs(function() {
+      var model, params, method, running = true;
+
+    runs(function() {
+      var Thing = StackMob.Model.extend({ schemaName: 'permanent' });
+      var thing = new Thing({ id: "id" });
+        thing.fetch({
+          done: function(mod,p,m){
+            running = false;
+            model = mod;
+            params = p;
+            method = m;
+          }
+        });
+
+      });
+      waitsFor(function() {
+        return running === false;
+      });
+
+      runs(function() {
+        expect(params['url']).toStartWith('http://api.permanent.com/');
+        expect(StackMob.getBaseURL()).toEqual('api.permanent.com/');
+        expect(StackMob.Storage.retrieve("apiDomain")).toEqual('api.permanent.com/');
+      });
     });
   });
 
   it("should clear ajax mocks", function() {
     runs(function() {
+      StackMob.Storage.remove("apiDomain");
       clearAllAjaxMocks();
     });
   });
