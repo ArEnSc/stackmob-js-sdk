@@ -149,7 +149,7 @@ describe("Unit tests for API Redirect", function() {
 
   it("should clear ajax mocks", function() {
     runs(function() {
-      StackMob.Storage.remove("apiDomain")
+      StackMob.Storage.remove("apiDomain");
       clearAllAjaxMocks();
     });
   });
