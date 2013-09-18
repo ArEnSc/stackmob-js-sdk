@@ -1032,9 +1032,12 @@
         return StackMob['ajaxOptions']['jquery'](model, params, method, options);
       }
     },
-    always : function(model, params, method, options) {
 
+    // Stubbed out method that is called after an API call regardless of success or failure
+    always : function(model, params, method, options) {
+      // Intentionally left blank for developer/test to implement by extending StackMob object
     },
+
     onsuccess : function(model, method, params, result, success, options) {
       /**
        * If there's an internal success callback function, execute it.
