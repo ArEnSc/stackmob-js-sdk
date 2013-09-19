@@ -8,7 +8,6 @@ describe("Unit tests for Custom Code", function() {
     mockFetch = mockFetchAsSuccess();
     mockPut = mockUpdateAsSuccess();
     mockDelete = mockDeleteAsSuccess();
-    StackMob.clearOAuthCredentials();
   });
 
   it("should set http verb to POST", function() {
