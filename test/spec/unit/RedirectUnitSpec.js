@@ -155,7 +155,9 @@ describe("Unit tests for API Redirect", function() {
 
   it("should clear ajax mocks", function() {
     runs(function() {
+      // Reset apiDomain to original value
       StackMob.Storage.remove("apiDomain");
+      delete StackMob['apiDomain'];
       clearAllAjaxMocks();
     });
   });
