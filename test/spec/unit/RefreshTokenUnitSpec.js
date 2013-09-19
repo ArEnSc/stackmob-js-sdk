@@ -4,9 +4,11 @@ describe("Unit tests for refresh tokens", function() {
   var mockedLogin, mockedSave;
 
   it("should set up mock ajax", function() {
-    $.mockjaxClear();
+    clearAllAjaxMocks();
     mockedLogin = mockLoginAsSuccess();
     mockedSave = mockCreateAsSuccess();
+    new StackMob.User().logout();
+    StackMob.clearOAuthCredentials();
   });
 
   var Thing = StackMob.Model.extend({
