@@ -12,14 +12,13 @@
 describe("Social Unit Tests", function() {
 
   // Mock Ajax Calls
-  var mockCreate, mockFetch, mockPut, mockDelete;
+  var mockedLogin, mockedFetch, mockedPut, mockedDelete;
 
   it("should set up mock ajax", function() {
-    mockCreate = mockCreateAsSuccess();
-    mockFetch = mockFetchAsSuccess();
-    mockPut = mockUpdateAsSuccess();
-    mockDelete = mockDeleteAsSuccess();
-    StackMob.clearOAuthCredentials();
+    mockedLogin = mockLogin(200, 3);
+    mockedFetch = mockFetchAsSuccess();
+    mockedPut = mockUpdateAsSuccess();
+    mockedDelete = mockDeleteAsSuccess();
   });
 
   it("should call linkUserWithFacebook", function() {
@@ -97,6 +96,7 @@ describe("Social Unit Tests", function() {
   it("should clear ajax mocks", function() {
     runs(function() {
       clearAllAjaxMocks();
+      StackMob.clearOAuthCredentials();
     });
   });
 

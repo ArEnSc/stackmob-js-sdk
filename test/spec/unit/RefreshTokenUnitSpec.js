@@ -7,8 +7,6 @@ describe("Unit tests for refresh tokens", function() {
     clearAllAjaxMocks();
     mockedLogin = mockLoginAsSuccess();
     mockedSave = mockCreateAsSuccess();
-    new StackMob.User().logout();
-    StackMob.clearOAuthCredentials();
   });
 
   var Thing = StackMob.Model.extend({

@@ -29,7 +29,7 @@ function mockAjax(type, statusCode) {
 
 function mockLogin(statusCode, expiryTime){
   return $.mockjax({
-    url: '*api.stackmob.com/user/accessToken',
+    url: '*api.stackmob.com/user/*',
     status: statusCode,
     type: 'POST',
     dataType: 'json',

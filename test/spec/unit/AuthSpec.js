@@ -8,13 +8,13 @@
 describe("Unit tests for Authentication", function() {
 
   // Mock Ajax Calls
-  var mockCreate, mockFetch, mockPut, mockDelete;
+  var mockedLogin, mockedFetch, mockedPut, mockedDelete;
 
   it("should set up mock ajax", function() {
-    mockCreate = mockCreateAsSuccess();
-    mockFetch = mockFetchAsSuccess();
-    mockPut = mockUpdateAsSuccess();
-    mockDelete = mockDeleteAsSuccess();
+    mockedLogin = mockLogin(200, 3);
+    mockedFetch = mockFetchAsSuccess();
+    mockedPut = mockUpdateAsSuccess();
+    mockedDelete = mockDeleteAsSuccess();
   });
 
   it("should override getOAuthCredentials", function() {
