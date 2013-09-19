@@ -1,10 +1,3 @@
-/**
- * This suite will test the three security modes of the SDK
- * Always - All requests will be made over HTTPS
- * Never - All requests will be made over HTTP
- * Mixed - Only authentication methods will be made over HTTPS
- */
-
 describe("Unit tests for API Redirect", function() {
 
   // Mock Ajax Calls
