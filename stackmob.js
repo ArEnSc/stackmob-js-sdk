@@ -452,6 +452,19 @@
 
       return _.isFunction(object[prop]) ? object[prop]() : object[prop];
     },
+
+    setAPIDomain: function(apiDomain, persist) {
+      if (apiDomain.indexOf('/') == apiDomain.length - 1){
+        this.apiDomain = apiDomain;
+      } else {
+        this.apiDomain = apiDomain + '/';
+      }
+
+      if (persist === true){
+        StackMob.Storage.persist("apiDomain", this.apiDomain);
+      }
+    },
+
     /**
      * Externally called by user to initialize their StackMob config.
      */
@@ -479,7 +492,7 @@
       this.apiVersion = options['apiVersion'] || this.DEFAULT_API_VERSION;
 
       /*
-       * apiURL (DEPRECATED) - Advaanced Users Only.  Use apiDomain instead.
+       * apiURL (DEPRECATED) - Advanced Users Only.  Use apiDomain instead.
        * Used to redirect SDK requests to a different URL.
        *
        */
@@ -498,12 +511,11 @@
         if (apiDomain.indexOf('http') === 0){
           throw new Error("Error: apiDomain should not specify url scheme (http/https). For example, specify api.stackmob.com instead of http://api.stackmob.com. URL Scheme is determined by the 'secure' init variable.");
         } else {
-          if (apiDomain.indexOf('/') == apiDomain.length - 1){
-            this.apiDomain = apiDomain;
-          } else {
-            this.apiDomain = apiDomain + '/';
-          }
+          StackMob.setAPIDomain(apiDomain);
         }
+      } else if (_.isString(StackMob.Storage.retrieve("apiDomain"))) {
+        var domain = StackMob.Storage.retrieve("apiDomain");
+        StackMob.setAPIDomain(domain);
       }
 
       /*
@@ -728,6 +740,10 @@
 
   }
 
+  function getDomain(url) {
+    return url.match(/:\/\/(.[^/]+)/)[1];
+  }
+
   _.extend(StackMob, {
 
     isSencha : function() {
@@ -789,8 +805,6 @@
           var userSchemaInfo = options['stackmob_userschemainfo'] || savedCreds['oauth2.userSchemaInfo']; //get schema info
 
           var loginField = userSchemaInfo['loginField']; //so that we can determine the primary key/login field
-          console.log("result");
-          console.log(result);
           var username = result['stackmob']['user'][loginField]; //figure out username
 
           var creds = StackMob.prepareCredsForSaving(accessToken, refreshToken, macKey, expires, username, userSchemaInfo);
@@ -1016,6 +1030,12 @@
         return StackMob['ajaxOptions']['jquery'](model, params, method, options);
       }
     },
+
+    // Stubbed out method that is called after an API call regardless of success or failure
+    always : function(model, params, method, options) {
+      // Intentionally left blank for developer/test to implement by extending StackMob object
+    },
+
     onsuccess : function(model, method, params, result, success, options) {
       /**
        * If there's an internal success callback function, execute it.
@@ -1067,10 +1087,13 @@
           success();
         }
       }
+      StackMob.always(model, params, method, options);
     },
+
     onerror : function(response, responseText, ajaxFunc, model, params, err, options) {
       var statusCode = response.status;
-      var result;
+      var result, newLocation, authHeader;
+
       try {
         result = JSON.parse(responseText);
       } catch (e) {
@@ -1079,36 +1102,66 @@
         };
       }
 
-      if(statusCode == 503) {
-        var wait = response.getResponseHeader('retry-after');
-        try {
-          wait = parseInt(responseHeaderValue, 10) * 1000;
-        } catch(e) {
-          wait = StackMob.RETRY_WAIT;
-        }
+      switch(statusCode) {
 
-        // If this is the first retry, set remaining attempts
-        // Otherwise decrement the retry counter
-        if(typeof params['stackmob_retry'] === 'number') {
-          params['stackmob_retry'] -= 1;
-          if(params['stackmob_retry'] <= 0){ return; }
-        } else {
-          params['stackmob_retry'] = StackMob.RETRY_ATTEMPTS ;
-        }
+        // API REDIRECT
+        case 301:
+        case 302:
+          newLocation = response.getResponseHeader('location');
+          if (_.isString(newLocation) && _.isFunction(ajaxFunc)) {
+            // Set new location
+            params['url'] = newLocation;
 
-        // Set delay for the next retry attempt
-        _.delay(function() {
-          var authHeader = getAuthHeader(params);
-          params['headers']['Authorization'] = authHeader;
-          if (ajaxFunc) ajaxFunc(params);
-        }, wait);
-      } else {
-        if(_.isFunction(params['oncomplete']))
-          params['oncomplete'](result);
-        if(err)
-          err(result);
+            // Set apiDomain for subsequent requests
+            StackMob.setAPIDomain( getDomain(newLocation), statusCode === 301 );
+
+            // Get auth for new location
+            authHeader = getAuthHeader(params);
+            params['headers']['Authorization'] = authHeader;
+
+            // Retry request on new location
+            ajaxFunc(params);
+          }
+          break;
+
+        // RETRY
+        case 503:
+          var wait = response.getResponseHeader('retry-after');
+          try {
+            wait = parseInt(responseHeaderValue, 10) * 1000;
+          } catch(e) {
+            wait = StackMob.RETRY_WAIT;
+          }
+
+          // If this is the first retry, set remaining attempts
+          // Otherwise decrement the retry counter
+          if( _.isNumber(params['stackmob_retry'])) {
+            params['stackmob_retry'] -= 1;
+            if(params['stackmob_retry'] <= 0){ return; }
+          } else {
+            params['stackmob_retry'] = StackMob.RETRY_ATTEMPTS ;
+          }
+
+          // Set delay for the next retry attempt
+          _.delay(function() {
+            var authHeader = getAuthHeader(params);
+            params['headers']['Authorization'] = authHeader;
+            if (ajaxFunc) ajaxFunc(params);
+          }, wait);
+
+          break;
+
+        // ALL OTHER RESPONSE CODES
+        default:
+          if(_.isFunction(params['oncomplete']))
+            params['oncomplete'](result);
+          if(err)
+            err(result);
       }
+
+      StackMob.always(model, params, null, options);
     },
+
     isAccessTokenMethod : function(method) {
       var accessTokenMethods = ['accessToken',
                         'refreshToken',
@@ -1117,6 +1170,7 @@
                         'gigyaAccessToken'];
       return _.include(accessTokenMethods, method);
     },
+
     _isSecureMethod : function(method, params){
       var secureMethods = ['loginWithTempAndSetNewPassword',
                             'createUserWithFacebook',
@@ -2065,7 +2119,11 @@
               result = response.responseText || response.text;
             }
           } else if(response) {
-            result = response;
+            try {
+              result = JSON.parse(response);
+            } catch(e) {
+              result = response;
+            }
           }
           StackMob.onsuccess(model, method, params, result, success, options);
           dfd.resolve(model, result, options);

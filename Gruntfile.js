@@ -11,7 +11,13 @@ module.exports = function(grunt) {
       options: {
         '-W069': true // ignore jshint suggestion to use dot notation
       },
-      all: ['stackmob.js']
+      all: ['stackmob.js'],
+      tests: {
+        options: {
+          '-W083': true // ignore jshint suggestion to not make functions within loops
+        },
+        src: ['test/spec/unit/*Spec.js']
+      }
     },
     'uglify': {
       options: {

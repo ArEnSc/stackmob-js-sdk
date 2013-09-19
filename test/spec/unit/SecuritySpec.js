@@ -14,6 +14,13 @@ describe("Unit tests for security modes", function() {
   var mockCreate, mockFetch, mockPut, mockDelete;
 
   it("should set up mock ajax", function() {
+    mockedLogin = $.mockjax({
+      url: 'https://api.stackmob.com/user/accessToken',
+      status: 200,
+      type: 'POST',
+      responseText: {"access_token":"32IhEH7WsuOmin6JvL7ZnrdhdEIhyCX3","mac_key":"uIEJTvImfqJ3pMQfp05U3nT1ePa7kDJd","mac_algorithm":"hmac-sha-1","token_type":"mac","expires_in":3600,"refresh_token":"wkaOCn9kmcZWbUdj2s3HGr1pvWmOKC5A","stackmob":{"user":{"location":"7be52c12445e446998f24a18b582c6e6","username":"justin","lastmoddate":1362793271996,"sm_owner":"user/justin","createddate":1362793271996}}}
+    });
+
     mockCreate = mockCreateAsSuccess();
     mockFetch = mockFetchAsSuccess();
     mockPut = mockUpdateAsSuccess();
@@ -28,7 +35,7 @@ describe("Unit tests for security modes", function() {
     StackMob.secure = StackMob.SECURE_MIXED;
   });
 
-  it("should use HTTP for non authentication methods", function() {
+  it("(MIXED) should use HTTP for non authentication methods", function() {
 
     var params,
         running = true;
@@ -57,50 +64,74 @@ describe("Unit tests for security modes", function() {
     });
   });
 
-  it("should use HTTPS for User.create", function() {
+  it("(MIXED) should use HTTPS for User.create", function() {
+    var model, params, method, running = true;
+
     runs(function() {
-      var model, params, method;
       var user = new StackMob.User({username: "testUser", password: "testUser"});
       user.create({
         inspectParams: function(mod,p,m){
+          running = false;
           model = mod;
           params = p;
           method = m;
         }
       });
+    });
 
+    waitsFor(function() {
+      return running === false;
+    });
+
+    runs(function() {
       expect(params['url'].indexOf(HTTPS)).toEqual(0);
     });
   });
 
-  it("should use HTTPS for linkUserWithFacebook", function() {
+  it("(MIXED) should use HTTPS for linkUserWithFacebook", function() {
+    var model, params, method, running = true;
+
     runs(function() {
-      var model, params, method;
       var user = new StackMob.User({username: "testUser", password: "testUser"});
       user.linkUserWithFacebook("fakeAccessToken", {
         inspectParams: function(mod,p,m){
+          running = false;
           model = mod;
           params = p;
           method = m;
         }
       });
+    });
 
+    waitsFor(function() {
+      return running === false;
+    });
+
+    runs(function() {
       expect(params['url'].indexOf(HTTPS)).toEqual(0);
     });
   });
 
-  it("should use HTTPS for authentication methods", function() {
+  it("(MIXED) should use HTTPS for authentication methods", function() {
+    var model, params, method, running = true;
+
     runs(function() {
-      var model, params, method;
       var user = new StackMob.User({username: "testUser", password: "testUser"});
       user.login(true, {
         inspectParams: function(mod,p,m){
+          running = false;
           model = mod;
           params = p;
           method = m;
         }
       });
+    });
 
+    waitsFor(function() {
+      return running === false;
+    });
+
+    runs(function() {
       expect(params['url'].indexOf(HTTPS)).toEqual(0);
     });
   });
@@ -113,34 +144,50 @@ describe("Unit tests for security modes", function() {
     StackMob.secure = StackMob.SECURE_ALWAYS;
   });
 
-  it("should use HTTPS for non-authentication methods", function() {
+  it("(ALWAYS) should use HTTPS for non-authentication methods", function() {
+    var model, params, method, running = true;
+
     runs(function() {
-      var model, params, method;
       var user = new StackMob.User({username: "testUser", password: "testUser"});
       user.create({
         inspectParams: function(mod,p,m){
+          running = false;
           model = mod;
           params = p;
           method = m;
         }
       });
+    });
 
+    waitsFor(function() {
+      return running === false;
+    });
+
+    runs(function() {
       expect(params['url'].indexOf(HTTPS)).toEqual(0);
     });
   });
 
-  it("should use HTTPS for authentication methods", function() {
+  it("(ALWAYS) should use HTTPS for authentication methods", function() {
+    var model, params, method, running = true;
+
     runs(function() {
-      var model, params, method;
       var user = new StackMob.User({username: "testUser", password: "testUser"});
       user.login(true, {
         inspectParams: function(mod,p,m){
+          running = false;
           model = mod;
           params = p;
           method = m;
         }
       });
+    });
 
+    waitsFor(function() {
+      return running === false;
+    });
+
+    runs(function() {
       expect(params['url'].indexOf(HTTPS)).toEqual(0);
     });
   });
@@ -155,84 +202,124 @@ describe("Unit tests for security modes", function() {
     });
   });
 
-  it("should use HTTP for non-authentication methods", function() {
+  it("(NEVER) should use HTTP for non-authentication methods", function() {
+    var model, params, method, running = true;
+
     runs(function() {
-      var model, params, method;
       var user = new StackMob.User({username: "testUser", password: "testUser"});
       user.create({
         inspectParams: function(mod,p,m){
+          running = false;
           model = mod;
           params = p;
           method = m;
         }
       });
+    });
 
+    waitsFor(function() {
+      return running === false;
+    });
+
+    runs(function() {
       expect(params['url'].indexOf(HTTP)).toEqual(0);
     });
   });
 
-  it("should use HTTP for authentication methods", function() {
+  it("(NEVER) should use HTTP for authentication methods", function() {
+    var model, params, method, running = true;
+
     runs(function() {
-      var model, params, method;
       var user = new StackMob.User({username: "testUser", password: "testUser"});
       user.login(true, {
         inspectParams: function(mod,p,m){
+          running = false;
           model = mod;
           params = p;
           method = m;
         }
       });
+    });
 
+    waitsFor(function() {
+      return running === false;
+    });
+
+    runs(function() {
       expect(params['url'].indexOf(HTTP)).toEqual(0);
     });
   });
 
-  it("should use HTTPS for setting request to use secure", function() {
+  it("(NEVER) should use HTTPS for setting request to use secure", function() {
+    var model, params, method, running = true;
+
     runs(function() {
-      var model, params, method;
       var user = new StackMob.User({username: "testUser", password: "testUser"});
       user.create({
         inspectParams: function(mod,p,m){
+          running = false;
           model = mod;
           params = p;
           method = m;
         },
         secureRequest: true
       });
+    });
 
+    waitsFor(function() {
+      return running === false;
+    });
+
+    runs(function() {
       expect(params['url'].indexOf(HTTPS)).toEqual(0);
     });
   });
 
-  it("should use HTTP for linkUserWithFacebook", function() {
+  it("(NEVER) should use HTTP for linkUserWithFacebook", function() {
+    var model, params, method, running = true;
+
     runs(function() {
-      var model, params, method;
       var user = new StackMob.User({username: "testUser", password: "testUser"});
       user.linkUserWithFacebook("fakeAccessToken", {
         inspectParams: function(mod,p,m){
+          running = false;
           model = mod;
           params = p;
           method = m;
         }
       });
+    });
 
+    waitsFor(function() {
+      return running === false;
+    });
+
+    runs(function() {
       expect(params['url'].indexOf(HTTP)).toEqual(0);
     });
   });
 
-  it("should use HTTPS for linkUserWithFacebook when forced with secureRequest", function() {
+  it("(NEVER) should use HTTPS for linkUserWithFacebook when forced with secureRequest", function() {
+    var model, params, method, running = true;
+
     runs(function() {
-      var model, params, method;
       var user = new StackMob.User({username: "testUser", password: "testUser"});
       user.linkUserWithFacebook("fakeAccessToken", {
         inspectParams: function(mod,p,m){
+          running = false;
           model = mod;
           params = p;
           method = m;
         },
         secureRequest: true
       });
+    });
 
+    waitsFor(function() {
+      return running === false;
+    });
+
+    runs(function() {
       expect(params['url'].indexOf(HTTPS)).toEqual(0);
     });
   });

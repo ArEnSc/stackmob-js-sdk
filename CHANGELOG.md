@@ -6,6 +6,7 @@
 
 * Add support for [Underscore.Deferred](https://github.com/wookiehangover/underscore.deferred)
 * Not-in query support with `mustNotBeOneOf()`
+* Support API redirection on 301 (Permanent) and 302 (Temporary) response statuses
 
 **Fixes**
 
