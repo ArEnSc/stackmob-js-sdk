@@ -1092,7 +1092,7 @@
       StackMob.always(model, params, method, options);
     },
 
-    onerror : function(response, responseText, ajaxFunc, model, params, err, options) {
+    onerror : function(response, textStatus, responseText, ajaxFunc, model, params, err, options) {
       var statusCode = response.status;
       var result, newLocation, authHeader;
 
@@ -1100,9 +1100,13 @@
         result = JSON.parse(responseText);
       } catch (e) {
         result = {
-          error : 'Invalid JSON returned.'
+          error : 'Invalid JSON returned.',
+          'responseText': responseText
         };
       }
+
+      result['textStatus'] = textStatus;
+
 
       switch(statusCode) {
 
@@ -2005,7 +2009,7 @@
 
         var defaultError = function(response, options) {
           var responseText = response.responseText || response.text;
-          StackMob.onerror(response, responseText, $.Ajax.request, model, hash, error, options);
+          StackMob.onerror(response, response.timedout ? 'Timed out' : '', responseText, $.Ajax.request, model, hash, error, options);
         };
         params['error'] = defaultError;
         hash['failure'] = params['error'];
@@ -2032,7 +2036,7 @@
         var error = params['error'];
         var defaultError = function(xhr, errorType, err) {
           var responseText = xhr.responseText || xhr.text;
-          StackMob.onerror(xhr, responseText, $.ajax, model, params, error, options);
+          StackMob.onerror(xhr, errorType, responseText, $.ajax, model, params, error, options);
         };
         params['error'] = defaultError;
 
@@ -2083,7 +2087,7 @@
             return;
           }
           var responseText = jqXHR.responseText || jqXHR.text;
-          StackMob.onerror(jqXHR, responseText, $.ajax, model, params, error, options);
+          StackMob.onerror(jqXHR, textStatus, responseText, $.ajax, model, params, error, options);
         };
 
         // Set up success callback
