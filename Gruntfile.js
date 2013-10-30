@@ -104,7 +104,6 @@ module.exports = function(grunt) {
         }
       },
       jquery: {
-        src: 'test/init.js',
         options: {
           junit: {
             path: 'results'
@@ -117,6 +116,7 @@ module.exports = function(grunt) {
           ],
           helpers: [
             'dist/stackmob-js-<%= pkg.version %>-bundled-min.js',
+            'test/init.js',
             'test/spec/SpecHelper.js',
             'test/spec/modifyExpiry.js'
           ]
