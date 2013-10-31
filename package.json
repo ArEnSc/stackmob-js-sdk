@@ -1,6 +1,6 @@
 {
   "name": "stackmob-js-sdk",
-  "version": "1.0.0",
+  "version": "1.0.0-partial-alpha-better-errors",
   "description": "StackMob JavaScript SDK",
   "main": "Gruntfile.js",
   "directories": {
